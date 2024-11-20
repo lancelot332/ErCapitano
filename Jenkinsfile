@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-      DOCKERHUB_CREDENTIALS = 'dockerhub-credentials'
+        DOCKERHUB_CREDENTIALS = 'dockerhub-credentials'
     }
 
     stages {
@@ -16,7 +16,8 @@ pipeline {
                 script {
                     docker.withRegistry('', DOCKERHUB_CREDENTIALS) {
                         def image = docker.build("kira002/flask-app-example:latest")
-                        image.push
+                        image.push()
+                    }
                 }
             }
         }
