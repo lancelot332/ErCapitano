@@ -11,14 +11,19 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Build and Push Docker Image') {
             steps {
                 script {
+                    // Determina il tag in base al branch
+                    def branch = env.GIT_BRANCH ?: 'unknown'
+                    def tag = branch.contains('main') ? 'latest' : (branch.contains('develop') ? 'develop' : 'other')
+
                     docker.withRegistry('', DOCKERHUB_CREDENTIALS) {
-                        def image = docker.build("kira002/flask-app-example:latest")
+                        def image = docker.build("kira002/flask-app-example:${tag}")
                         image.push()
                     }
-                    sh "docker rmi --force kira002/flask-app-example:latest"
+                    // Rimuove l'immagine locale
+                    sh "docker rmi --force kira002/flask-app-example:${tag}"
                 }
             }
         }
