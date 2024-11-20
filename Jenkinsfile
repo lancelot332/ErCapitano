@@ -1,5 +1,8 @@
 pipeline {
     agent any
+    environment {
+      DOCKERHUB_CREDENTIALS = 'dockerhub-credentials'
+    }
 
     stages {
         stage('Checkout') {
@@ -11,19 +14,9 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t kira002/flask-app-example:latest ."
-                }
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                    script {
-                        // Login su Docker
-                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
-                        sh "docker push kira002/flask-app-example:latest"
-                    }
+                    docker.withRegistry('', DOCKERHUB_CREDENTIALS) {
+                        def image = docker.build("kira002/flask-app-example:latest")
+                        image.push
                 }
             }
         }
