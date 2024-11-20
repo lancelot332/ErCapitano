@@ -1,13 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKERHUB_CREDENTIALS = 'dockerhub-credentials' // Nome ID delle credenziali su Jenkins
-        DOCKERHUB_USER = 'kira002'  // Sostituisci con il tuo username DockerHub
-        REPO_NAME = 'marco-flask-app'       // Nome della tua repository su DockerHub
-        IMAGE_TAG = 'latest'                    // Tag predefinito dell'immagine Docker
-    }
-
     stages {
         stage('Checkout') {
             steps {
@@ -25,8 +18,10 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', DOCKERHUB_CREDENTIALS) {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-credentials', usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                    script {
+                        // Login su Docker
+                        sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
                         sh "docker push kira002/flask-app-example:latest"
                     }
                 }
