@@ -1,8 +1,8 @@
 pipeline {
     agent any
-    def defaults = [
+    def defaults = {
         DOCKERHUB_CREDENTIALS = 'dockerhub-credentials'
-    ]
+        }
 
     stages {
         stage('Checkout') {
