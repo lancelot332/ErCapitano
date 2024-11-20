@@ -1,13 +1,13 @@
 pipeline {
     agent any
-    environment {
+    def defaults = [
         DOCKERHUB_CREDENTIALS = 'dockerhub-credentials'
-    }
+    ]
 
     stages {
         stage('Checkout') {
             steps {
-                checkout scm // Clona la repository Git
+                checkout scm
             }
         }
 
@@ -18,17 +18,9 @@ pipeline {
                         def image = docker.build("kira002/flask-app-example:latest")
                         image.push()
                     }
+                    sh "docker rmi --force kira002/flask-app-example:latest"
                 }
             }
-        }
-    }
-
-    post {
-        success {
-            echo "Pipeline completata con successo!"
-        }
-        failure {
-            echo "Errore durante l'esecuzione della pipeline."
         }
     }
 }
