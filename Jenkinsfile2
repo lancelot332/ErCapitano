@@ -1,0 +1,74 @@
+pipeline {
+	agent { label 'master' }
+	environment {
+		KUB_NAMESPACE = 'formazione-sou'
+		SCRIPT_PATH='/home/vagrant/export-deployment.sh'
+		KEY_PATH='/var/jenkins_home/.ssh/id_rsa'
+		HOST='formazionesou.local'
+	}
+	parameters {
+		string(name: 'TAG', defaultValue: 'latest', description: 'Docker image tag')
+	}
+	stages {
+		stage('Clone repository') {
+			steps {
+				checkout scm
+			}
+		}
+		stage('Install nginx Ingress controller') {
+			steps {
+				script {
+					sh(script: "helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx") 
+					sh(script: "helm repo update")
+					sh(script: "helm upgrade --install flask-app-ingress ingress-nginx/ingress-nginx --namespace ${KUB_NAMESPACE} --set controller.service.type=NodePort")
+				}
+			}
+		}
+		stage('Wait for NGINX to Initialize') {
+            steps {
+                script {
+                    echo "Waiting for NGINX Ingress Controller to initialize..."
+                    sleep 30
+                }
+            }
+        }
+		stage('Helm update dependencies and Helm install') {
+			steps {
+				dir('formazione_sou_k8s/flask-app/charts') {
+					script {
+						sh '''
+						#!/bin/bash
+						helm upgrade --install my-app . --namespace ${KUB_NAMESPACE} --set image.tag=${TAG} --set ingress.host=${HOST} --debug
+						'''
+					}
+				}
+			}
+		}
+		stage('Export deployment') {
+			steps {
+				script {
+					sh '''
+					#!/bin/bash
+					ssh -T -i ${KEY_PATH} -o StrictHostKeyChecking=no vagrant@192.168.10.10 "chmod +x ${SCRIPT_PATH} && bash ${SCRIPT_PATH}"
+					'''
+				}
+			}
+		}
+		stage('Configure DNS') {
+			steps {
+				script {
+					sh '''
+					#!/bin/bash
+					ssh -T -i ${KEY_PATH} -o StrictHostKeyChecking=no vagrant@192.168.10.10 'NODE_IP=$(kubectl get service flask-service -n formazione-sou -o jsonpath="{.spec.clusterIP}") && echo "${NODE_IP} formazionesou.local" | sudo tee -a /etc/hosts'
+					'''
+				}
+			}
+		}
+	}
+	post {
+		always {
+			echo 'Cleaning up workspace'
+			cleanWs()
+		}
+	}
+}
