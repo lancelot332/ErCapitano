@@ -18,7 +18,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKERHUB_USER}/${REPO_NAME}:${IMAGE_TAG}")
+                    sh "docker build -t kira002/flask-app-example:latest ."
                 }
             }
         }
@@ -27,7 +27,7 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://registry.hub.docker.com', DOCKERHUB_CREDENTIALS) {
-                        docker.image("${DOCKERHUB_USER}/${REPO_NAME}:${IMAGE_TAG}").push()
+                        sh "docker push kira002/flask-app-example:latest"
                     }
                 }
             }
