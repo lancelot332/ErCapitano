@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        KUBECONFIG = "/root/.kube/config" // Percorso al file kubeconfig nel container Jenkins
+        KUBECONFIG = "/var/jenkins_home/.kube/config" // Percorso al file kubeconfig nel container Jenkins
     }
     stages {
         stage('Clone Chart Repository') {
@@ -12,7 +12,7 @@ pipeline {
         stage('Helm Install') {
             steps {
                 sh '''
-                helm upgrade --install my-app ./charts/my-chart \
+                helm upgrade --install flask-app ./charts/charts \
                   --namespace formazione-sou \
                   --set image.tag=latest
                 '''
