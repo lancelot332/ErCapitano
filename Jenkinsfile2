@@ -14,7 +14,7 @@ pipeline {
                 sh '''
                 helm upgrade --install flask-app ./charts/charts \
                   --namespace formazione-sou \
-                  --set image.tag=latest
+                  --set image.tag=develop
                 '''
             }
         }
