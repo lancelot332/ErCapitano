@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Clone Chart Repository') {
             steps {
-                git branch: 'develop', url: 'https://github.com/ErCapitano'
+                git branch: 'develop', url: 'https://github.com/lancelot332/ErCapitano'
             }
         }
         stage('Helm Install') {
