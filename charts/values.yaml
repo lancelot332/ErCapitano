@@ -6,15 +6,15 @@ image:
   pullPolicy: IfNotPresent
 
 service:
-  type: NodePort
+  type: ClusterIp
   port: 80
   targetPort: 8000
 
 ingress:
-  enabled: false # Cambia a true se vuoi abilitare l'Ingress
-  annotations: {} # Aggiungi annotazioni come richiesto dal tuo Ingress Controller
+  enabled: false 
+  annotations: {} 
   hosts:
-    - host: example.com # Cambia con il tuo dominio o IP
+    - host: flask-app.com 
       paths:
         - path: /
           pathType: ImplementationSpecific
