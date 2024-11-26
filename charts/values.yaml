@@ -1,53 +1,29 @@
+replicaCount: 1
+
 image:
   repository: kira002/flask-app-example
-  pullPolicy: Always
-  tag: develop
-  name: flask-app
+  tag: "develop"
+  pullPolicy: IfNotPresent
 
 service:
-  name: flask-service
-  type: ClusterIP
-  ports:
-    - name: http
-      port: 80
-      targetPort: 8000
-
-namespace: formazione-sou
-
-serviceAccount:
-  create: true
-  name: cluster-reader
+  type: ClusterIp
+  port: 80
+  targetPort: 8000
 
 ingress:
-  enabled: true
-  className: nginx
-  name: flask-ingress
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/backend-protocol: "HTTP"
-  host: formazionesou.local
-  serviceName: flask-service
-  servicePort: http
+  enabled: false 
+  annotations: {} 
+  hosts:
+    - host: flask-app.com 
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: [] 
 
 resources:
   limits:
-    cpu: 500m
-    memory: 512Mi
+    cpu: "500m"
+    memory: "256Mi"
   requests:
-    cpu: 200m
-    memory: 256Mi
-
-livenessProbe:
-  httpGet:
-    path: /
-    port: 8000
-  initialDelaySeconds: 5
-  periodSeconds: 10
-
-readinessProbe:
-  httpGet:
-    path: /
-    port: 8000
-  initialDelaySeconds: 15
-  periodSeconds: 25
-
+    cpu: "250m"
+    memory: "128Mi"
