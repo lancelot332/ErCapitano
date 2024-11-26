@@ -10,6 +10,16 @@ service:
   port: 80
   targetPort: 8000
 
+ingress:
+  enabled: false # Cambia a true se vuoi abilitare l'Ingress
+  annotations: {} # Aggiungi annotazioni come richiesto dal tuo Ingress Controller
+  hosts:
+    - host: example.com # Cambia con il tuo dominio o IP
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: [] 
+
 resources:
   limits:
     cpu: "500m"
