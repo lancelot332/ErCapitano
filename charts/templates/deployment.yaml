@@ -2,28 +2,18 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}
-  labels:
-    app: {{ .Chart.Name }}
 spec:
-  replicas: {{ .Values.replicaCount }}
+  replicas: 1
   selector:
     matchLabels:
-      app: {{ .Chart.Name }}
+      app: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ .Chart.Name }}
+        app: {{ .Release.Name }}
     spec:
       containers:
-      - name: {{ .Chart.Name }}
-        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
-        imagePullPolicy: {{ .Values.image.pullPolicy }}
-        ports:
-        - containerPort: {{ .Values.service.targetPort }}
-        resources:
-          limits:
-            cpu: {{ .Values.resources.limits.cpu }}
-            memory: {{ .Values.resources.limits.memory }}
-          requests:
-            cpu: {{ .Values.resources.requests.cpu }}
-            memory: {{ .Values.resources.requests.memory }}
+        - name: flask-app
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"  # Usando i valori dal values.yaml
+          ports:
+            - containerPort: 8000
