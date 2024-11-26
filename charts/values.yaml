@@ -1,7 +1,7 @@
 image:
-  repository: marboccu/flask-app-example
+  repository: kira002/flask-app-example
   pullPolicy: Always
-  tag: latest
+  tag: develop
   name: flask-app
 
 service:
