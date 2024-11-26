@@ -19,7 +19,7 @@ ingress:
         - path: /
           pathType: ImplementationSpecific
   tls: [] 
-
+    
 resources:
   limits:
     cpu: "500m"
@@ -27,3 +27,12 @@ resources:
   requests:
     cpu: "250m"
     memory: "128Mi"
+
+livenessProbe:
+  httpGet:
+    path: /
+    port: 8000
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8000
