@@ -1,7 +1,7 @@
 pipeline {
     agent any
     environment {
-        KUBECONFIG = "/var/jenkins_home/.kube/config" // Percorso al file kubeconfig nel container Jenkins
+        KUBECONFIG = "/var/jenkins_home/.kube/config"
     }
     stages {
         stage('Clone Chart Repository') {
