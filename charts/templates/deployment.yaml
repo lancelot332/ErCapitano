@@ -20,13 +20,6 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - containerPort: {{ .Values.service.targetPort }}
-          resources:
-            limits:
-              cpu: {{ .Values.resources.limits.cpu }}
-              memory: {{ .Values.resources.limits.memory }}
-            requests:
-              cpu: {{ .Values.resources.requests.cpu }}
-              memory: {{ .Values.resources.requests.memory }}
 
           livenessProbe:
             httpGet:
@@ -40,3 +33,11 @@ spec:
               port: {{ .Values.probes.readinessProbe.httpGet.port }}
             initialDelaySeconds: {{ .Values.probes.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.probes.readinessProbe.periodSeconds }}
+
+            resources:
+            limits:
+              cpu: {{ .Values.resources.limits.cpu }}
+              memory: {{ .Values.resources.limits.memory }}
+            requests:
+              cpu: {{ .Values.resources.requests.cpu }}
+              memory: {{ .Values.resources.requests.memory }}
