@@ -5,6 +5,12 @@ image:
   tag: "develop"
   pullPolicy: IfNotPresent
 
+serviceAccount:
+  create: true
+  automount: true
+  annotations: {}
+  name: "cluster-reader"
+
 service:
   type: NodePort
   port: 80
