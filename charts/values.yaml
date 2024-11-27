@@ -7,9 +7,12 @@ image:
 
 serviceAccount:
   create: true
-  automount: true
+  name: cluster-reader
   annotations: {}
-  name: "cluster-reader"
+  clusterRoleBinding:
+    create: true
+    roleName: cluster-reader
+    roleNamespace: ""
 
 service:
   type: NodePort
