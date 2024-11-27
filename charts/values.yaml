@@ -11,7 +11,7 @@ service:
   targetPort: 8000
 
 ingress:
-  enabled: false 
+  enabled: true 
   annotations: {} 
   hosts:
     - host: flask-app.com 
