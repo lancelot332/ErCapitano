@@ -17,4 +17,4 @@ spec:
               service:
                 name: {{ .Release.Name }}-flask-service
                 port:
-                  number: {{ .Values.service.ports.port }}
+                  number: {{ .Values.service.port }}
