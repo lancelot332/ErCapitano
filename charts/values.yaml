@@ -2,25 +2,53 @@ replicaCount: 1
 
 image:
   repository: kira002/flask-app-example
-  tag: latest
+  tag: "develop"
   pullPolicy: IfNotPresent
+
+serviceAccount:
+  create: true
+  name: cluster-reader
+  annotations: {}
+  clusterRoleBinding:
+    create: true
+    roleName: cluster-reader
+    roleNamespace: ""
 
 service:
   type: NodePort
   port: 80
   targetPort: 8000
-  nodePort: 32000
+  nodePort: 30000
 
 ingress:
-  enabled: true
-  className: nginx
-  host: flask-app.local
-  path: /
-  pathType: ImplementationSpecific
+  enabled: true                   
+  hosts: 
+    - "formazionesou.local"              
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: nginx
+  tls:
+    - secretName: flask-app-tls     
+      hosts:
+        - formazionesou.local
+    
+resources:
+  limits:
+    cpu: "500m"
+    memory: "256Mi"
+  requests:
+    cpu: "250m"
+    memory: "128Mi"
 
-resources: {}
-nodeSelector: {}
-tolerations: []
-affinity: {}
+livenessProbe:
+  httpGet:
+    path: /
+    port: 8000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /
+    port: 8000
+  initialDelaySeconds: 3
+  periodSeconds: 5
