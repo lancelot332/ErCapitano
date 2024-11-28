@@ -1,53 +1,96 @@
-replicaCount: 1
+# Definizione dei valori di base per flask-app-chart
 
+# Numero di repliche per il deploy
+replicaCount: 2
+
+# Configurazione dell'immagine Docker per l'applicazione
 image:
-  repository: kira002/flask-app-example
-  tag: "develop"
-  pullPolicy: IfNotPresent
+  repository: lucacisotto/flask-app-example  # Repository dell'immagine
+  pullPolicy: IfNotPresent                   # Politica di pull dell'immagine
+  tag: "latest"                              # Tag dell'immagine (modificabile in fase di rilascio)
 
-serviceAccount:
-  create: true
-  name: cluster-reader
-  annotations: {}
-  clusterRoleBinding:
-    create: true
-    roleName: cluster-reader
-    roleNamespace: ""
+# Se desideri utilizzare un'immagine privata, aggiungi i secrets qui (opzionale)
+imagePullSecrets: []
 
+# Configurazione del Service (porta e tipo)
 service:
-  type: NodePort
-  port: 80
-  targetPort: 8000
+  type: NodePort      # Tipo di servizio (ClusterIP, NodePort, LoadBalancer, etc.)
+  port: 80             # Porta esposta dal servizio
 
+# Configurazione Ingress (se abilitato, esponi l'app tramite un Ingress Controller)
 ingress:
-  enabled: true                   
-  hosts: 
-    - "formazionesou.local"              
-  annotations:
-    kubernetes.io/ingress.class: nginx
-  tls:
-    - secretName: flask-app-tls     
-      hosts:
-        - formazionesou.local
-    
-resources:
-  limits:
-    cpu: "500m"
-    memory: "256Mi"
-  requests:
-    cpu: "250m"
-    memory: "128Mi"
+  enabled: true        # Abilitato per il Bonus Track
+  className: "nginx"   # Nginx Ingress Controller
+  annotations: 
+    nginx.ingress.kubernetes.io/rewrite-target: "/"  # Rewrite per il path root
+  hosts:
+    - host: formazionesou.local    # Dominio per l'accesso al servizio
+      paths:
+        - path: /
+          pathType: Prefix         # Indica il tipo di percorso
+        - path: /api
+          pathType: Prefix         # Indica il tipo di percorso  
+  tls: []               # Configura TLS se necessario
 
+# Liveness e Readiness Probes per monitorare la salute dell'app
 livenessProbe:
   httpGet:
-    path: /
-    port: 8000
-  initialDelaySeconds: 5
-  periodSeconds: 10
+    path: /healthz      # Path per la Liveness Probe
+    port: 5000            # Porta da monitorare
+  initialDelaySeconds: 10
+  periodSeconds: 15
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
 
 readinessProbe:
   httpGet:
-    path: /
-    port: 8000
-  initialDelaySeconds: 3
-  periodSeconds: 5
+    path: /readyz       # Path per la Readiness Probe
+    port: 5000            # Porta da monitorare
+  initialDelaySeconds: 5
+  periodSeconds: 10
+  timeoutSeconds: 5
+  failureThreshold: 3
+  successThreshold: 1
+
+# Impostazioni per l'autoscaling (disabilitato di default)
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+
+# Risorse: configurazione dei limiti e delle richieste per il pod
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+# Volumi e mount (opzionale)
+volumes: []
+volumeMounts: []
+
+# Service Account e RBAC
+serviceAccount:
+  create: true                  # Crea un Service Account
+  name: cluster-reader-sa       # Nome del Service Account
+  annotations: {}               # Eventuali annotazioni per il Service Account
+
+rbac:
+  create: true                  # Crea le risorse RBAC (ClusterRoleBinding)
+  roleRefName: cluster-reader   # Nome del ClusterRole da associare
+
+# Namespace per il rilascio
+namespace: formazione-sou
+
+# Impostazioni di sicurezza e context
+securityContext: {}
+podSecurityContext: {}
+
+# Impostazioni di affinità per il pod (opzionale)
+affinity: {}
+nodeSelector: {}
+tolerations: []
