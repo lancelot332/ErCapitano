@@ -3,11 +3,11 @@ kind: Service
 metadata:
   name: {{ .Release.Name }}-service
   labels:
-    app: {{ .Chart.Name }}
+    app: {{ .Release.Name }}
 spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
-      targetPort: 8000
+      targetPort: {{ .Values.service.targetPort }}
   selector:
-    app: {{ .Chart.Name }}
+    app: {{ .Release.Name }}
