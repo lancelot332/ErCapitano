@@ -18,3 +18,5 @@ spec:
                 name: {{ .Release.Name }}-flask-service
                 port:
                   number: {{ .Values.service.port }}
+                targetPort:
+                  namber: {{ .Values.service.targetPort}}
