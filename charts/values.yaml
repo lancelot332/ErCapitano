@@ -15,7 +15,7 @@ serviceAccount:
     roleNamespace: ""
 
 service:
-  type: LoadBalancer
+  type: NodePort
   port: 8000
   targetPort: 8000
   nodePort: 30000
