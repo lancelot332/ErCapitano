@@ -20,14 +20,9 @@ service:
   targetPort: 8000
 
 ingress:
-  enabled: true 
-  annotations: {} 
-  hosts:
-    - host: flask-app.com 
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: [] 
+  enabled: true
+  className: nginx
+  host: formazionesou.local
     
 resources:
   limits:
