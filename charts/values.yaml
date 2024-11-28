@@ -16,7 +16,7 @@ serviceAccount:
 
 service:
   type: NodePort
-  port: 8000
+  port: 80
   targetPort: 8000
 
 ingress:
