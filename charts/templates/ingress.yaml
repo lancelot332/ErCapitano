@@ -5,9 +5,8 @@ metadata:
   annotations:
     kubernetes.io/ingress.class: "nginx"
 spec:
-  ingressClassName: nginx
   rules:
-    - host: "formazionesou.local"
+    - host: "mario.local"  # Domini personalizzabili
       http:
         paths:
           - path: /
