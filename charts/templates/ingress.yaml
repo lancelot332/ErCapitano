@@ -4,20 +4,17 @@ kind: Ingress
 metadata:
   name: {{ .Release.Name }}-ingress
   annotations:
-    {{- range $key, $value := .Values.ingress.annotations }}
-    {{ $key }}: "{{ $value }}"
-    {{- end }}
+    kubernetes.io/ingress.class: {{ .Values.ingress.className }}
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  ingressClassName: {{ .Values.ingress.className }}
   rules:
-  - host: {{ .Values.ingress.host }}
+  - host: {{ .Values.ingress.hostname }}
     http:
       paths:
-      - path: {{ .Values.ingress.path }}
-        pathType: {{ .Values.ingress.pathType }}
+      - path: /
+        pathType: Prefix
         backend:
           service:
-            name: {{ .Release.Name }}-flask-app
+            name: {{ .Release.Name }}-service
             port:
               number: {{ .Values.service.port }}
-{{- end }}
