@@ -21,18 +21,15 @@ service:
   nodePort: 30000
 
 ingress:
-  enabled: true        # Abilitato per il Bonus Track
-  className: "nginx"   # Nginx Ingress Controller
-  annotations: 
-    nginx.ingress.kubernetes.io/rewrite-target: "/"  # Rewrite per il path root
-  hosts:
-    - host: formazionesou.local    # Dominio per l'accesso al servizio
-      paths:
-        - path: /
-          pathType: Prefix         # Indica il tipo di percorso
-        - path: /api
-          pathType: Prefix         # Indica il tipo di percorso  
-  tls: []  
+  enabled: true                   
+  hosts: 
+    - "formazionesou.local"              
+  annotations:
+    kubernetes.io/ingress.class: nginx
+  tls:
+    - secretName: flask-app-tls     
+      hosts:
+        - formazionesou.local  
     
 resources:
   limits:
