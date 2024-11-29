@@ -21,12 +21,18 @@ service:
   nodePort: 30000
 
 ingress:
-  enabled: true
-  className: "nginx"        
-  hostname: "my-app.local"  
-  tls:                     
-    enabled: false
-    secretName: ""
+  enabled: true        # Abilitato per il Bonus Track
+  className: "nginx"   # Nginx Ingress Controller
+  annotations: 
+    nginx.ingress.kubernetes.io/rewrite-target: "/"  # Rewrite per il path root
+  hosts:
+    - host: formazionesou.local    # Dominio per l'accesso al servizio
+      paths:
+        - path: /
+          pathType: Prefix         # Indica il tipo di percorso
+        - path: /api
+          pathType: Prefix         # Indica il tipo di percorso  
+  tls: []  
     
 resources:
   limits:
