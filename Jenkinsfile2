@@ -6,7 +6,7 @@ pipeline {
     stages {
         stage('Clone Chart Repository') {
             steps {
-                git branch: 'latest', url: 'https://github.com/kirax02/Formazione_sou_k8s'
+                git branch: 'main', url: 'https://github.com/kirax02/Formazione_sou_k8s'
             }
         }
         stage('Helm Install') {
