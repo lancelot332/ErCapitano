@@ -24,7 +24,9 @@ Il file `deployment.yaml` definisce come viene gestito il ciclo di vita del pod,
 il file `service.yaml` crea un service che espone l'applicazione all'interno del cluster Kubernetes, rendendola raggiungibile tramite un nome di servizio e una porta.
 
 ### `serviceaccount.yaml`
-Il file `serviceaccount.yaml` crea un ServiceAccount per l'applicazione, utile per assegnare permessi di accesso a risorse Kubernetes.
+Il file `serviceaccount.yaml` crea un ServiceAccount per l'applicazione, utile per assegnare permessi di accesso a risorse Kubernetes.  
+Questo file ci servirà per lo step 5.
 
 ### `ingress.yaml`
-Il file `ingress.yaml` crea un ingress che consente l'accesso esterno all'applicazione tramite un Ingress, instradando il traffico HTTP verso il servizio.
+Il file `ingress.yaml` crea un ingress che consente l'accesso esterno all'applicazione tramite un Ingress, instradando il traffico HTTP verso il servizio.  
+Questo file ci servirà per lo step 6
