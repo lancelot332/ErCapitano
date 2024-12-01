@@ -2,21 +2,14 @@
 
 Questo progetto configura una pipeline Jenkins per installare Helm e `kubectl`, e consente l'uso di Helm per distribuire applicazioni su un cluster Kubernetes creato con Minikube.
 
-## Requisiti
+## Creazione del cluster di Kubernetes su MAC.
 
-1. **MacOS** con i seguenti strumenti installati:
-   - [Minikube](https://minikube.sigs.k8s.io/docs/start/):  
-     ```bash
-     brew install minikube
-     ```
-   - [Hyperkit](https://github.com/moby/hyperkit):  
-     ```bash
-     brew install hyperkit
-     ```
+Per la creazione del cluster su MAC abbiamo bisogno dei seguenti strumenti: minikube e hyperkit che si possono installare con i seguenti comandi:  
+     `brew install minikube`
+  
+     `brew install hyperkit`
 
-2. Un container Docker che esegue Jenkins, configurato per accedere al cluster Kubernetes.
-
-## Setup del cluster Kubernetes
+## Setup per far interaggire jenkins con il cluster.
 
 1. **Avvio del cluster con Hyperkit**:  
    ```bash
