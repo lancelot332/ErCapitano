@@ -46,7 +46,7 @@ Con queste task invece spostiamo helm binary in /usr/local/bin e lo rendiamo ese
         command: >
           chmod +x /usr/local/bin/helm
 ```
-Una volta installato helm copiamo il file utili per la configurazione del cluster di k8s con le seguenti task
+Una volta installato helm copiamo i file utili per la configurazione del cluster di k8s dal MAC alla VM con le seguenti task
 ```yaml
     - name: Copy kubeconfig to VM
       copy:
