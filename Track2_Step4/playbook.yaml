@@ -1,0 +1,135 @@
+---
+- name: Installazione di k3s su Rocky Linux 9
+  hosts: all
+  become: true
+  tasks:
+
+    - name: Download Docker repository
+      get_url:
+        url: https://download.docker.com/linux/centos/docker-ce.repo
+        dest: /etc/yum.repos.d/docker-ce.repo
+
+    - name: Install Docker
+      package:
+        name: docker-ce
+        state: present
+
+    - name: Start Docker service
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+
+
+    - name: Install Python requests
+      package:
+        name: python3-requests
+        state: present
+
+    - name: Pull Docker image for Jenkins Master
+      docker_image:
+        name: jenkins/jenkins:lts
+        source: pull
+
+    - name: Create Jenkins container Master
+      docker_container:
+        name: jenkins_master
+        image: jenkins/jenkins:lts
+        ports:
+          - "8080:8080"
+          - "50000:50000"
+        state: started
+          
+    - name: Download Helm binary
+      community.docker.docker_container_exec:
+        container: jenkins_master
+        user: root
+        command: "curl -fsSL -o /var/jenkins_home/helm.tar.gz https://get.helm.sh/helm-v3.16.3-linux-amd64.tar.gz"
+
+    - name: Extract Helm binary
+      community.docker.docker_container_exec:
+        container: jenkins_master
+        user: root
+        command: "tar -xzf /var/jenkins_home/helm.tar.gz -C /var/jenkins_home --strip-components=1 linux-amd64/helm"
+
+    - name: Move Helm binary to /usr/local/bin
+      community.docker.docker_container_exec:
+        container: jenkins_master
+        user: root
+        command: "/bin/sh -c 'mv /var/jenkins_home/helm /usr/local/bin/helm; chmod +x /usr/local/bin/helm'"
+
+    - name: Copia config dal Mac alla VM
+      copy:
+        src: /Users/lorenzomoro/.kube/config
+        dest: /home/vagrant/config
+
+    - name: Copia client.crt
+      copy:
+        src: /Users/lorenzomoro/.minikube/profiles/minikube/client.crt
+        dest: /home/vagrant/client.crt
+
+    - name: Copia client.key
+      copy:
+        src: /Users/lorenzomoro/.minikube/profiles/minikube/client.key
+        dest: /home/vagrant/client.key
+
+    - name: replace client.crt
+      ansible.builtin.replace:
+        path: /home/vagrant/config
+        regexp: 'client-certificate: /Users/lorenzomoro/.minikube/profiles/minikube/client.crt'
+        replace: 'client-certificate: /var/jenkins_home/client.crt'
+
+    - name: replace client.key
+      ansible.builtin.replace:
+        path: /home/vagrant/config
+        regexp: 'client-key: /Users/lorenzomoro/.minikube/profiles/minikube/client.key'
+        replace: 'client-key: /var/jenkins_home/client.key'
+
+    - name: replace certificare
+      ansible.builtin.replace:
+        path: /home/vagrant/config
+        regexp: 'certificate-authority: /Users/lorenzomoro/.minikube/ca.crt'
+        replace: 'certificate-authority:'
+
+    - name: Aggiungi o modifica la riga
+      ansible.builtin.lineinfile:
+        path: /home/vagrant/config
+        insertafter: '^    certificate-authority:.*'  # Dopo "certificate-authority"
+        line: '    insecure-skip-tls-verify: true'
+
+
+    - name: Create .kube dir in jenkins_home
+      community.docker.docker_container_exec:
+        container: jenkins_master
+        user: jenkins
+        command: mkdir -p /var/jenkins_home/.kube
+
+    - name: Copy kubeconfig to Jenkins container
+      ansible.builtin.command:
+        cmd:  docker cp /home/vagrant/config jenkins_master:/var/jenkins_home/.kube/config
+
+    - name: Copy kubeconfig to Jenkins container
+      ansible.builtin.command:
+        cmd:  docker cp /home/vagrant/client.crt jenkins_master:/var/jenkins_home/client.crt
+
+    - name: Copy kubeconfig to Jenkins container
+      ansible.builtin.command:
+        cmd:  docker cp /home/vagrant/client.key jenkins_master:/var/jenkins_home/client.key
+   
+    - name: Download kubectl binary in Jenkins container
+      community.docker.docker_container_exec:
+        container: jenkins_master
+        user: root
+        command: "curl -LO https://dl.k8s.io/release/v1.27.3/bin/linux/amd64/kubectl"
+
+    - name: Make kubectl executable
+      community.docker.docker_container_exec:
+        container: jenkins_master
+        user: root
+        command: "chmod +x kubectl"
+
+    - name: Move kubectl to /usr/local/bin
+      community.docker.docker_container_exec:
+        container: jenkins_master
+        user: root
+        command: "mv kubectl /usr/local/bin/"
