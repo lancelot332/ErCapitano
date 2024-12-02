@@ -1,5 +1,5 @@
 ---
-- name: Installazione di k3s su Rocky Linux 9
+- name: Configurazione VM e container jenkins
   hosts: all
   become: true
   tasks:
