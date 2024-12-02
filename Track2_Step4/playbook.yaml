@@ -62,57 +62,67 @@
       community.docker.docker_container_exec:
         container: jenkins_master
         user: root
-        command: "curl -fsSL -o /var/jenkins_home/helm.tar.gz https://get.helm.sh/helm-v3.16.3-linux-amd64.tar.gz"
+        command: >
+          curl -fsSL -o /var/jenkins_home/helm.tar.gz https://get.helm.sh/helm-v3.16.3-linux-amd64.tar.gz
 
     - name: Extract Helm binary
       community.docker.docker_container_exec:
         container: jenkins_master
         user: root
-        command: "tar -xzf /var/jenkins_home/helm.tar.gz -C /var/jenkins_home --strip-components=1 linux-amd64/helm"
+        command: >
+          tar -xzf /var/jenkins_home/helm.tar.gz -C /var/jenkins_home --strip-components=1 linux-amd64/helm
 
     - name: Move Helm binary to /usr/local/bin
       community.docker.docker_container_exec:
         container: jenkins_master
         user: root
-        command: "/bin/sh -c 'mv /var/jenkins_home/helm /usr/local/bin/helm; chmod +x /usr/local/bin/helm'"
+        command: >
+          mv /var/jenkins_home/helm /usr/local/bin/helm
 
-    - name: Copia config dal Mac alla VM
+    - name: Add execution permission to helm
+      community.docker.docker_container_exec:
+        container: jenkins_master
+        user: root
+        command: >
+          chmod +x /usr/local/bin/helm
+
+    - name: Copy kubeconfig to VM
       copy:
         src: /Users/lorenzomoro/.kube/config
         dest: /home/vagrant/config
 
-    - name: Copia client.crt
+    - name: Copy client.crt to VM
       copy:
         src: /Users/lorenzomoro/.minikube/profiles/minikube/client.crt
         dest: /home/vagrant/client.crt
 
-    - name: Copia client.key
+    - name: Copy client.key to VM
       copy:
         src: /Users/lorenzomoro/.minikube/profiles/minikube/client.key
         dest: /home/vagrant/client.key
 
-    - name: replace client.crt
+    - name: Replace client.crt
       ansible.builtin.replace:
         path: /home/vagrant/config
         regexp: 'client-certificate: /Users/lorenzomoro/.minikube/profiles/minikube/client.crt'
         replace: 'client-certificate: /var/jenkins_home/client.crt'
 
-    - name: replace client.key
+    - name: Replace client.key
       ansible.builtin.replace:
         path: /home/vagrant/config
         regexp: 'client-key: /Users/lorenzomoro/.minikube/profiles/minikube/client.key'
         replace: 'client-key: /var/jenkins_home/client.key'
 
-    - name: replace certificare
+    - name: Replace certificare
       ansible.builtin.replace:
         path: /home/vagrant/config
         regexp: 'certificate-authority: /Users/lorenzomoro/.minikube/ca.crt'
         replace: 'certificate-authority:'
 
-    - name: Aggiungi o modifica la riga
+    - name: Add lines
       ansible.builtin.lineinfile:
         path: /home/vagrant/config
-        insertafter: '^    certificate-authority:.*'  # Dopo "certificate-authority"
+        insertafter: '^    certificate-authority:.*'
         line: '    insecure-skip-tls-verify: true'
 
 
@@ -126,11 +136,11 @@
       ansible.builtin.command:
         cmd:  docker cp /home/vagrant/config jenkins_master:/var/jenkins_home/.kube/config
 
-    - name: Copy kubeconfig to Jenkins container
+    - name: Copy client.crt to Jenkins container
       ansible.builtin.command:
         cmd:  docker cp /home/vagrant/client.crt jenkins_master:/var/jenkins_home/client.crt
 
-    - name: Copy kubeconfig to Jenkins container
+    - name: Copy client.key to Jenkins container
       ansible.builtin.command:
         cmd:  docker cp /home/vagrant/client.key jenkins_master:/var/jenkins_home/client.key
    
@@ -138,4 +148,19 @@
       community.docker.docker_container_exec:
         container: jenkins_master
         user: root
-        command: "curl -LO https://dl.k8s.io/release/v1.27.3/bin/linux/amd64/kubectl; chmod +x kubectl; mv kubectl /usr/local/bin/"
+        command: > 
+          curl -LO https://dl.k8s.io/release/v1.27.3/bin/linux/amd64/kubectl
+
+    - name: Move kubectl binary in /usr/local/bin
+      community.docker.docker_container_exec:
+        container: jenkins_master
+        user: root
+        command: >
+          mv kubectl /usr/local/bin/
+
+    - name: Add execution permission to kubectl
+      community.docker.docker_container_exec:
+        container: jenkins_master
+        user: root
+        command: >
+          chmod +x /usr/local/bin/kubectl
