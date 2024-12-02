@@ -91,7 +91,7 @@ Bisogna modificare il file sostituendo i path corretti per i certificati e aggiu
         insertafter: '^    certificate-authority:.*'
         line: '    insecure-skip-tls-verify: true'
  ```
-Con le seguenti task invece creiamo la directory che conterrà il config e copiamo i file necessari dalla nostra VM al container jenkins
+Con le seguenti task invece andiamo a creare la directory che conterrà il config e copiamo i file necessari dalla nostra VM al container jenkins
 ```yaml
     - name: Create .kube dir in jenkins_home
       community.docker.docker_container_exec:
