@@ -1,6 +1,5 @@
 ---
-- name: Configurazione VM e container jenkins
-  hosts: all
+- hosts: all
   become: true
   tasks:
 
@@ -26,6 +25,13 @@
         name: python3-requests
         state: present
 
+    - name: Create a network with custom IPAM config
+      docker_network:
+        name: Mario_network
+        ipam_config:
+          - subnet: 192.168.10.0/24
+            gateway: 192.168.10.1
+
     - name: Pull Docker image for Jenkins Master
       docker_image:
         name: jenkins/jenkins:lts
@@ -35,10 +41,22 @@
       docker_container:
         name: jenkins_master
         image: jenkins/jenkins:lts
+        networks:
+          - name: Mario_network
+            ipv4_address: 192.168.10.2
         ports:
           - "8080:8080"
           - "50000:50000"
         state: started
+        volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - /usr/bin/docker:/usr/bin/docker
+
+    - name: Add group docker in jenkins_master container
+      command: docker exec --user root jenkins_master groupadd -g 989 docker
+
+    - name: Add jenkins user to docker group
+      command: docker exec --user root jenkins_master usermod -aG docker jenkins
           
     - name: Download Helm binary
       community.docker.docker_container_exec:
@@ -120,16 +138,4 @@
       community.docker.docker_container_exec:
         container: jenkins_master
         user: root
-        command: "curl -LO https://dl.k8s.io/release/v1.27.3/bin/linux/amd64/kubectl"
-
-    - name: Make kubectl executable
-      community.docker.docker_container_exec:
-        container: jenkins_master
-        user: root
-        command: "chmod +x kubectl"
-
-    - name: Move kubectl to /usr/local/bin
-      community.docker.docker_container_exec:
-        container: jenkins_master
-        user: root
-        command: "mv kubectl /usr/local/bin/"
+        command: "curl -LO https://dl.k8s.io/release/v1.27.3/bin/linux/amd64/kubectl; chmod +x kubectl; mv kubectl /usr/local/bin/"
