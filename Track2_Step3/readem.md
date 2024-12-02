@@ -1,4 +1,4 @@
-# Helm Chart
+# Step 3
 
 Questo Helm chart effettua il deploy di un'applicazione Docker presente nel proprio Docker Hub su un cluster Kubernetes all'interno del namespace `formazione-sou`.
 
