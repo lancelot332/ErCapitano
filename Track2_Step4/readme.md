@@ -14,7 +14,8 @@ Questo comando avvia un cluster Kubernetes con Minikube utilizzando tutte le int
 ## Configurazione di Jenkins per interagire con il cluster ed installazione di Helm
 
 Ho fatto alcune modifiche al playbook cosi che il container jenkins possa interagire con il cluster e possa utilizzare helm.  
-Ho aggiunto al playbook le seguenti task che scaricano ed estraggono helm:
+
+Ho aggiunto al playbook le seguenti task che scaricano ed estraggono l' archivio di helm.
 ```yaml
     - name: Download Helm binary
       community.docker.docker_container_exec:
@@ -30,7 +31,7 @@ Ho aggiunto al playbook le seguenti task che scaricano ed estraggono helm:
         command: >
           tar -xzf /var/jenkins_home/helm.tar.gz -C /var/jenkins_home --strip-components=1 linux-amd64/helm
 ```
-Con queste task invece spostiamo helm binary in /usr/local/bin e lo rendiamo eseguibile
+Con queste task invece spostiamo l' eseguibile di helm in /usr/local/bin e gli impostiamo i permessi di esecuzione
 ```yaml
     - name: Move Helm binary to /usr/local/bin
       community.docker.docker_container_exec:
@@ -46,7 +47,7 @@ Con queste task invece spostiamo helm binary in /usr/local/bin e lo rendiamo ese
         command: >
           chmod +x /usr/local/bin/helm
 ```
-Una volta installato helm copiamo i file utili per la configurazione del cluster di k8s dal MAC alla VM con le seguenti task
+Una volta installato helm bisogna copiare i file utili per la configurazione del cluster di k8s dal MAC alla VM con le seguenti task
 ```yaml
     - name: Copy kubeconfig to VM
       copy:
@@ -63,7 +64,7 @@ Una volta installato helm copiamo i file utili per la configurazione del cluster
         src: /Users/lorenzomoro/.minikube/profiles/minikube/client.key
         dest: /home/vagrant/client.key
 ```
-Modifichiamo il file sostituendo i path corretti per i certificati e aggiungendo una linea che permette di ignorare il certificato con le seguente task
+Bisogna modificare il file sostituendo i path corretti per i certificati e aggiungendo una linea che permette di ignorare il certificato con le seguenti task
 
 ```yaml
     - name: Replace client.crt
@@ -133,3 +134,5 @@ Invece con le seguenti task scarichiamo il comando kubectl
         command: >
           chmod +x /usr/local/bin/kubectl
 ```
+## Lancio pipeline 
+Una volta finito il setup per jenkins bisogna lanciare la pipeline che effettuerà l' helm install sul namespace formazione-sou
