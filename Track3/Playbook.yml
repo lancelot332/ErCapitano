@@ -49,7 +49,6 @@
         name: alpine_ssh
         image: alpine_ssh
         state: started
-        restart_policy: unless-stopped
         ports:
           - "2222:22"
 
@@ -58,6 +57,5 @@
         name: ubuntu_ssh
         image: ubuntu_ssh
         state: started
-        restart_policy: unless-stopped
         ports:
           - "2223:22"
