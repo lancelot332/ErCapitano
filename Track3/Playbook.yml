@@ -1,0 +1,63 @@
+---
+- name: Build and configure Docker containers
+  hosts: localhost
+  tasks:
+    - name: Create directories for Dockerfiles
+      file:
+        path: "{{ item }}"
+        state: directory
+      with_items:
+        - ./alpine_container
+        - ./ubuntu_container
+
+    - name: Copy Dockerfile for Alpine
+      copy:
+        src: files/Dockerfile_alpine
+        dest: ./alpine_container/Dockerfile
+
+    - name: Copy id_rsa for Alpine
+      copy:
+        src: files/id_rsa.pub
+        dest: ./alpine_container
+
+    - name: Copy Dockerfile for Ubuntu
+      copy:
+        src: files/Dockerfile_ubuntu
+        dest: ./ubuntu_container/Dockerfile
+
+    - name: Copy id_rsa for Ubuntu
+      copy:
+        src: files/id_rsa.pub
+        dest: ./ubuntu_container
+
+    - name: Build Alpine container
+      docker_image:
+        source: build
+        build:
+          path: ./alpine_container
+        name: alpine_ssh
+
+    - name: Build Ubuntu container
+      docker_image:
+        source: build
+        build:
+          path: ./ubuntu_container
+        name: ubuntu_ssh
+
+    - name: Run Alpine container
+      docker_container:
+        name: alpine_ssh
+        image: alpine_ssh
+        state: started
+        restart_policy: unless-stopped
+        ports:
+          - "2222:22"
+
+    - name: Run Ubuntu container
+      community.docker.docker_container:
+        name: ubuntu_ssh
+        image: ubuntu_ssh
+        state: started
+        restart_policy: unless-stopped
+        ports:
+          - "2223:22"
