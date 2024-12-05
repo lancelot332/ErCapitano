@@ -24,7 +24,6 @@ RUN chown genericuser:genericuser /home/genericuser/.ssh/authorized_keys && \
     chmod 700 /home/genericuser/.ssh && \
     chmod 600 /home/genericuser/.ssh/authorized_keys
 
-
 EXPOSE 22
 
 CMD ["/usr/sbin/sshd", "-D"]
